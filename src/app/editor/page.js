@@ -8,6 +8,7 @@ export default function Editor() {
   const [summary, setSummary] = useState('');
   const [date, setDate] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
+  const [postToDevTo, setPostToDevTo] = useState(true);
   const [status, setStatus] = useState('');
   const router = useRouter();
   
@@ -53,7 +54,8 @@ export default function Editor() {
       date,
       summary,
       content,
-      isPrivate
+      isPrivate,
+      postToDevTo
     };
 
     setStatus('Saving...');
@@ -135,6 +137,19 @@ export default function Editor() {
                   />
                   <label htmlFor="post-private" style={{ margin: 0, cursor: 'pointer' }}>Make this post private</label>
               </div>
+
+              {!isPrivate && (
+                <div className="form-group" style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <input 
+                      type="checkbox" 
+                      id="post-devto"
+                      checked={postToDevTo}
+                      onChange={e => setPostToDevTo(e.target.checked)}
+                      style={{ width: 'auto' }}
+                    />
+                    <label htmlFor="post-devto" style={{ margin: 0, cursor: 'pointer' }}>Also post in dev.to</label>
+                </div>
+              )}
 
               <div className="form-group" style={{ marginTop: '2rem' }}>
                   <label htmlFor="md-editor">Content (Markdown)</label>

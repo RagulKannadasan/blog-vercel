@@ -12,8 +12,36 @@ export async function POST(request) {
     await dbConnect();
     const body = await request.json();
     
-    // Create new post
+    // Create new post locally
     const post = await Post.create(body);
+
+    // Cross-post to dev.to if API key is present, post is not private, and user opted in
+    if (!body.isPrivate && body.postToDevTo && process.env.DEVTO_API_KEY) {
+      try {
+        const devToRes = await fetch('https://dev.to/api/articles', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': process.env.DEVTO_API_KEY
+          },
+          body: JSON.stringify({
+            article: {
+              title: body.title,
+              body_markdown: body.content,
+              published: true
+            }
+          })
+        });
+
+        if (!devToRes.ok) {
+          console.error('Failed to cross-post to dev.to:', await devToRes.text());
+        } else {
+          console.log('Successfully cross-posted to dev.to!');
+        }
+      } catch (devToError) {
+        console.error('Error in dev.to cross-posting block:', devToError);
+      }
+    }
     
     return NextResponse.json({ success: true, post });
   } catch (error) {

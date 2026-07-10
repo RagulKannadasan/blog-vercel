@@ -51,11 +51,11 @@ export default function PostsGrid({ initialPosts }) {
         {filteredAndSortedPosts.length > 0 ? (
           filteredAndSortedPosts.map(post => (
             <Link href={`/post/${post.id}`} className="post-card" key={post.id}>
-              <h3>
+              <span className="post-date">{post.date}</span>
+              <h2>
                 {post.title}
                 {post.isPrivate && <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', background: 'var(--accent)', color: '#000', borderRadius: '4px', marginLeft: '0.5rem', verticalAlign: 'middle' }}>🔒 Private</span>}
-              </h3>
-              <p className="post-date">{post.date}</p>
+              </h2>
               <p className="post-summary">{post.summary}</p>
             </Link>
           ))

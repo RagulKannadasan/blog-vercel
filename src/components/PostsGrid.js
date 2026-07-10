@@ -50,11 +50,16 @@ export default function PostsGrid({ initialPosts }) {
       <div className="posts-grid">
         {filteredAndSortedPosts.length > 0 ? (
           filteredAndSortedPosts.map(post => (
-            <Link href={`/post/${post.id}`} className="post-card" key={post.id}>
+            <Link 
+              href={`/post/${post.id}`} 
+              className="post-card" 
+              key={post.id}
+            >
               <span className="post-date">{post.date}</span>
               <h2>
                 {post.title}
                 {post.isPrivate && <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', background: 'var(--accent)', color: '#000', borderRadius: '4px', marginLeft: '0.5rem', verticalAlign: 'middle' }}>🔒 Private</span>}
+                {post.isExternal && <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', background: '#3b49df', color: '#fff', borderRadius: '4px', marginLeft: '0.5rem', verticalAlign: 'middle' }}>dev.to</span>}
               </h2>
               <p className="post-summary">{post.summary}</p>
             </Link>

@@ -15,7 +15,31 @@ export default async function SinglePost({ params }) {
   await dbConnect();
   
   const p = await params;
-  const post = await Post.findOne({ id: p.id }).lean();
+  let post;
+
+  if (p.id.startsWith('devto-')) {
+    const devtoId = p.id.replace('devto-', '');
+    try {
+      const devToRes = await fetch(`https://dev.to/api/articles/${devtoId}`);
+      if (devToRes.ok) {
+        const article = await devToRes.json();
+        post = {
+          id: p.id,
+          title: article.title,
+          date: article.published_at ? article.published_at.split('T')[0] : '',
+          summary: article.description,
+          content: article.body_markdown || '*No markdown content available for this article.*',
+          isPrivate: false,
+          isExternal: true,
+          externalUrl: article.url
+        };
+      }
+    } catch (e) {
+      console.error('Error fetching dev.to article dynamically:', e);
+    }
+  } else {
+    post = await Post.findOne({ id: p.id }).lean();
+  }
   
   if (!post) {
     return notFound();
@@ -61,6 +85,11 @@ export default async function SinglePost({ params }) {
               <div className="post-content">
                   <MarkdownRenderer content={post.content} />
               </div>
+              {post.isExternal && post.externalUrl && (
+                <div style={{ marginTop: '3rem', padding: '1rem', background: 'var(--card-bg)', borderRadius: '8px', borderLeft: '4px solid #3b49df' }}>
+                  <p style={{ margin: 0 }}>This article was originally published on <a href={post.externalUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>dev.to</a>.</p>
+                </div>
+              )}
           </article>
 
           {backlinks.length > 0 && (

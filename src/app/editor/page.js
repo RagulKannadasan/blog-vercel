@@ -7,6 +7,7 @@ export default function Editor() {
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
   const [date, setDate] = useState('');
+  const [isPrivate, setIsPrivate] = useState(false);
   const [status, setStatus] = useState('');
   const router = useRouter();
   
@@ -51,7 +52,8 @@ export default function Editor() {
       title,
       date,
       summary,
-      content
+      content,
+      isPrivate
     };
 
     setStatus('Saving...');
@@ -121,6 +123,17 @@ export default function Editor() {
                     value={date}
                     onChange={e => setDate(e.target.value)}
                   />
+              </div>
+
+              <div className="form-group" style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <input 
+                    type="checkbox" 
+                    id="post-private"
+                    checked={isPrivate}
+                    onChange={e => setIsPrivate(e.target.checked)}
+                    style={{ width: 'auto' }}
+                  />
+                  <label htmlFor="post-private" style={{ margin: 0, cursor: 'pointer' }}>Make this post private</label>
               </div>
 
               <div className="form-group" style={{ marginTop: '2rem' }}>

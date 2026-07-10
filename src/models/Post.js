@@ -21,6 +21,10 @@ const PostSchema = new mongoose.Schema({
   content: {
     type: String,
     required: true,
+  },
+  isPrivate: {
+    type: Boolean,
+    default: false,
   }
 });
 

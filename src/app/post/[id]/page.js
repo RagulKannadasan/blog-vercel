@@ -3,8 +3,13 @@ import Post from '@/models/Post';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import { isAuthenticated } from '@/lib/auth';
 
 export const revalidate = 0;
+
+function escapeRegex(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 export default async function SinglePost({ params }) {
   await dbConnect();
@@ -15,6 +20,31 @@ export default async function SinglePost({ params }) {
   if (!post) {
     return notFound();
   }
+
+  const auth = await isAuthenticated();
+
+  if (post.isPrivate && !auth) {
+    return notFound();
+  }
+
+  // Fetch backlinks
+  const titlePattern = `\\[\\[${escapeRegex(post.title)}\\]\\]`;
+  const idPattern = `\\[\\[${escapeRegex(post.id)}\\]\\]`;
+
+  const backlinksQuery = {
+    $and: [
+      {
+        $or: [
+          { content: { $regex: titlePattern, $options: 'i' } },
+          { content: { $regex: idPattern, $options: 'i' } }
+        ]
+      },
+      { id: { $ne: post.id } },
+      ...(auth ? [] : [{ isPrivate: { $ne: true } }])
+    ]
+  };
+
+  const backlinks = await Post.find(backlinksQuery).select('id title').lean();
 
   return (
     <>
@@ -32,6 +62,21 @@ export default async function SinglePost({ params }) {
                   <MarkdownRenderer content={post.content} />
               </div>
           </article>
+
+          {backlinks.length > 0 && (
+            <section className="backlinks-section" style={{ marginTop: '4rem', paddingTop: '2rem', borderTop: '1px solid var(--border)' }}>
+              <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>References to this post</h2>
+              <ul style={{ listStyleType: 'none', padding: 0 }}>
+                {backlinks.map(bl => (
+                  <li key={bl.id} style={{ marginBottom: '0.5rem' }}>
+                    <Link href={`/post/${bl.id}`} style={{ color: 'var(--accent)', textDecoration: 'underline' }}>
+                      {bl.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
       </main>
     </>
   );

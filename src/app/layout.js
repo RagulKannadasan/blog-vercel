@@ -1,6 +1,5 @@
 import './globals.css'
-import Link from 'next/link'
-import ThemeToggle from '@/components/ThemeToggle'
+import Navbar from '@/components/Navbar'
 import NextTopLoader from 'nextjs-toploader'
 
 export const metadata = {
@@ -16,16 +15,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <NextTopLoader color="var(--accent)" height={4} showSpinner={false} />
-        {/* Top Navbar */}
-        <nav className="top-navbar">
-          <Link href="/" className="navbar-brand">Ragul's Blog</Link>
-          <div className="navbar-links">
-            <Link href="/" className="nav-link">Blog</Link>
-            <Link href="/profile" className="nav-link">Profile</Link>
-            <Link href="/editor" className="nav-link" style={{ opacity: 0.5, fontSize: '0.8rem' }}>Editor</Link>
-            <ThemeToggle />
-          </div>
-        </nav>
+        <Navbar />
         
         {/* Abstract Background Elements */}
         <div className="bg-shape shape-1"></div>
@@ -33,6 +23,9 @@ export default function RootLayout({ children }) {
 
         <div className="container">
           {children}
+          <footer>
+            <p>&copy; {new Date().getFullYear()} My Personal Blog. Built with ❤️ and Next.js.</p>
+          </footer>
         </div>
       </body>
     </html>

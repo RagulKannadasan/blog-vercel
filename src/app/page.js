@@ -1,13 +1,17 @@
 import dbConnect from '@/lib/db';
 import Post from '@/models/Post';
 import PostsGrid from '@/components/PostsGrid';
+import { isAuthenticated } from '@/lib/auth';
 
 export const revalidate = 0; 
 
 export default async function Home() {
   await dbConnect();
   
-  const posts = await Post.find({}).sort({ date: -1 }).lean();
+  const auth = await isAuthenticated();
+  const query = auth ? {} : { isPrivate: { $ne: true } };
+  
+  const posts = await Post.find(query).sort({ date: -1 }).lean();
   
   const serializedPosts = posts.map(post => ({
     ...post,

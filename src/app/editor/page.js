@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 export default function Editor() {
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
+  const [tags, setTags] = useState('');
   const [date, setDate] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
   const [postToDevTo, setPostToDevTo] = useState(true);
@@ -48,11 +49,14 @@ export default function Editor() {
 
     const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
+    const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+
     const postObject = {
       id,
       title,
       date,
       summary,
+      tags: tagsArray,
       content,
       isPrivate,
       postToDevTo
@@ -72,6 +76,7 @@ export default function Editor() {
       setStatus('Post published successfully!');
       setTitle('');
       setSummary('');
+      setTags('');
       if (mdeRef.current) mdeRef.current.value('');
       
       setTimeout(() => {
@@ -113,6 +118,18 @@ export default function Editor() {
                     placeholder="A brief description..."
                     value={summary}
                     onChange={e => setSummary(e.target.value)}
+                  />
+              </div>
+
+              <div className="form-group">
+                  <label htmlFor="post-tags">Tags (comma separated)</label>
+                  <input 
+                    type="text" 
+                    id="post-tags" 
+                    className="form-control" 
+                    placeholder="e.g., react, webdev, tutorial"
+                    value={tags}
+                    onChange={e => setTags(e.target.value)}
                   />
               </div>
 

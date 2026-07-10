@@ -10,13 +10,13 @@ export async function POST(request) {
     }
 
     await dbConnect();
-    const body = await request.json();
+    const { postToDevTo, ...postData } = await request.json();
     
     // Create new post locally
-    const post = await Post.create(body);
+    const post = await Post.create(postData);
 
     // Cross-post to dev.to if API key is present, post is not private, and user opted in
-    if (!body.isPrivate && body.postToDevTo && process.env.DEVTO_API_KEY) {
+    if (!postData.isPrivate && postToDevTo && process.env.DEVTO_API_KEY) {
       try {
         const devToRes = await fetch('https://dev.to/api/articles', {
           method: 'POST',
@@ -26,9 +26,10 @@ export async function POST(request) {
           },
           body: JSON.stringify({
             article: {
-              title: body.title,
-              body_markdown: body.content,
-              published: true
+              title: postData.title,
+              body_markdown: postData.content,
+              published: true,
+              tags: postData.tags || []
             }
           })
         });
@@ -49,7 +50,7 @@ export async function POST(request) {
     if (error.code === 11000) {
       return NextResponse.json({ success: false, message: 'A post with this ID already exists.' }, { status: 400 });
     }
-    return NextResponse.json({ success: false, message: 'Failed to save post' }, { status: 500 });
+    return NextResponse.json({ success: false, message: error.message || 'Failed to save post' }, { status: 500 });
   }
 }
 

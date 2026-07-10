@@ -29,5 +29,5 @@ export async function proxy(request) {
 }
 
 export const config = {
-  matcher: ['/editor/:path*', '/api/posts/:path*'],
+  matcher: ['/editor/:path*'],
 };

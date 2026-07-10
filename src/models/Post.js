@@ -28,6 +28,13 @@ const PostSchema = new mongoose.Schema({
   isPrivate: {
     type: Boolean,
     default: false,
+  },
+  isExternal: {
+    type: Boolean,
+    default: false,
+  },
+  externalUrl: {
+    type: String,
   }
 });
 

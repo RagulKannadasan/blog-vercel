@@ -38,6 +38,20 @@ export default function Editor() {
     }
   }, []);
 
+  const [syncStatus, setSyncStatus] = useState('');
+
+  const handleSync = async () => {
+    setSyncStatus('Syncing with dev.to...');
+    try {
+      const res = await fetch('/api/sync', { method: 'POST' });
+      const data = await res.json();
+      setSyncStatus(data.message || (data.success ? 'Synced successfully' : 'Sync failed'));
+    } catch (e) {
+      setSyncStatus('Error syncing');
+    }
+    setTimeout(() => setSyncStatus(''), 5000);
+  };
+
   const handleSubmit = async () => {
     setStatus('');
     const content = mdeRef.current ? mdeRef.current.value().trim() : '';
@@ -178,6 +192,15 @@ export default function Editor() {
               {status && <p style={{ margin: '1rem 0', color: status.includes('Error') ? 'red' : 'var(--accent)' }}>{status}</p>}
 
               <button onClick={handleSubmit} className="primary-btn">Publish Post</button>
+
+              <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid var(--border)' }}>
+                  <h3 style={{ marginBottom: '1rem' }}>External Sync</h3>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Fetch and sync your dev.to articles into MongoDB so they load quickly.</p>
+                  <button onClick={handleSync} className="secondary-btn" style={{ background: 'transparent', border: '1px solid var(--accent)', color: 'var(--text)', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}>
+                      Sync Dev.to Articles
+                  </button>
+                  {syncStatus && <p style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: syncStatus.includes('Error') || syncStatus.includes('failed') ? 'red' : 'var(--accent)' }}>{syncStatus}</p>}
+              </div>
           </div>
       </main>
     </>
